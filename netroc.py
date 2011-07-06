@@ -8,7 +8,7 @@ def __iterable__(some_object):
 	except TypeError, te:
 		return False
 
-def writeTest(alledges,ftrain,ftest,frac=0.1,delimiter='\t'):
+def writeTest(alledges,ftrain,ftest,frac=0.1,delimiter='\t',seed=0):
 	"""
 	writeTest(alledges,ftrain,ftest,frac=0.1,delimiter='\t')
 	where,
@@ -17,6 +17,7 @@ def writeTest(alledges,ftrain,ftest,frac=0.1,delimiter='\t'):
 		ftest : filename to write postive test set edges
 		frac : fraction of edges to include in test
 		delimiter : delimiter used in input file, the output files always use tabs
+		seed : seed for the prng
 	"""
 	nodes = set()
 	nlines = 0
@@ -28,7 +29,9 @@ def writeTest(alledges,ftrain,ftest,frac=0.1,delimiter='\t'):
 		raise TypeError("edges need to be given as a filename or iterable")
 	for e in eiter:
 		nlines = nlines +1
+	ntest = max(1,int(round(frac * nlines)))
 	shufinds = range(nlines)
+	random.seed(seed)
 	random.shuffle(shufinds)
 	if type(alledges) is str:
 		eiter = iter((line.rstrip().split(delimiter) for line in open(alledges,'r')))
@@ -57,7 +60,7 @@ def writeTest(alledges,ftrain,ftest,frac=0.1,delimiter='\t'):
 				else:
 					assert(all((x in nodes for x in e[:2])))
 					train.write('\t'.join(e))
-			i = i+1
+				i = i+1
 
 
 class NetReader(object):
