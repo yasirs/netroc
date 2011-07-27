@@ -56,10 +56,10 @@ def writeTest(alledges,ftrain,ftest,frac=0.1,delimiter='\t',seed=0):
 			for e in eiter:
 				if i in testinds:
 					if all((x in nodes for x in e[:2])):
-						test.write('\t'.join(e))
+						test.write('\t'.join(e)+'\n')
 				else:
 					assert(all((x in nodes for x in e[:2])))
-					train.write('\t'.join(e))
+					train.write('\t'.join(e)+'\n')
 				i = i+1
 
 
@@ -84,7 +84,7 @@ class NetReader(object):
 			fi = open(trainingedges,'r')
 			for line in fi:
 				words = line.rstrip().split(delimiter)
-				nodes.add(words[0]); verts.add(words[1])
+				nodes.add(words[0]); nodes.add(words[1])
 			fi.close()
 			self._nodes = sorted(nodes)
 			self._node2i = dict(zip(self._nodes,range(len(self._nodes))))
@@ -105,7 +105,7 @@ class NetReader(object):
 			raise TypeError("trainingedges needs to be filename or iterable")
 
 		if type(testedges) is str:
-			self._tetedges = []
+			self._testedges = []
 			fi = open(testedges,'r')
 			for line in fi:
 				words = line.rstrip().split(delimiter)
@@ -138,5 +138,6 @@ class NetReader(object):
 		return self._allLabels
 					
 	def nPair2Ind(self,x):
-		return ((self._node2i[x[1]]-1)*self._node2i[x[1]])/2 + self._node2i[x[0]]
+		y = sorted(x,reverse=True)
+		return ((self._node2i[y[1]]-1)*self._node2i[y[1]])/2 + self._node2i[y[0]]
 
