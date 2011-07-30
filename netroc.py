@@ -120,6 +120,23 @@ class NetReader(object):
 			self._allLabels[t]=1
 		self._allLabels = [self._allLabels[i] for i in xrange(len(self._allLabels)) if i not in self._trainedges]
 
+	def addScores(self,*scoreslist,delimiter='\t'):
+		scoreVec = [0 for i in xrange((self._numNodes*(self._numNodes-1))/2)]
+		for score in scoreslist:
+			if type(scores) is str:
+				fi = open(scores,'r')
+				for line in fi:
+					w = line.rstrip().split(delimiter)
+					scoreVec[self.nPair2Ind(w[:2])] += float(w[2])
+			elif __iterable__(scores):
+				for w in scores:
+					scoreVec[self.nPair2Ind(w[:2])] += float(w[2])
+			else:
+				raise TypeError("scores need to be filename or iterable")
+			scoreVec = [scoreVec[i] for i in xrange(len(scoreVec)) if i not in self._trainedges]
+			return scoreVec
+	
+
 	def makeScores(self,scores,delimiter='\t'):
 		scoreVec = [0 for i in xrange((self._numNodes*(self._numNodes-1))/2)]
 		if type(scores) is str:
