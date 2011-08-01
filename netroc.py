@@ -120,7 +120,9 @@ class NetReader(object):
 			self._allLabels[t]=1
 		self._allLabels = [self._allLabels[i] for i in xrange(len(self._allLabels)) if i not in self._trainedges]
 
-	def addScores(self,*scoreslist,delimiter='\t'):
+	def addScores(self,*scoreslist,**kwargs):
+		delimiter = kwargs.pop('delimiter','\t')
+		assert not(kwargs), "Only one named argument, delimiter allowed"
 		scoreVec = [0 for i in xrange((self._numNodes*(self._numNodes-1))/2)]
 		for score in scoreslist:
 			if type(scores) is str:
