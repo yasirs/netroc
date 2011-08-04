@@ -52,6 +52,7 @@ def writeTest(alledges,ftrain,ftest,frac=0.1,delimiter='\t',seed=0):
 
 	with open(ftrain,'w') as train:
 		with open(ftest,'w') as test:
+			trainlines = []
 			i = 0
 			for e in eiter:
 				if i in testinds:
@@ -59,8 +60,11 @@ def writeTest(alledges,ftrain,ftest,frac=0.1,delimiter='\t',seed=0):
 						test.write('\t'.join(e)+'\n')
 				else:
 					assert(all((x in nodes for x in e[:2])))
-					train.write('\t'.join(e)+'\n')
+					trainlines.append(('\t'.join(e)+'\n'))
 				i = i+1
+			random.shuffle(trainlines)
+			train.writelines(trainlines)
+			del trainlines
 
 
 class NetReader(object):
@@ -122,21 +126,24 @@ class NetReader(object):
 
 	def addScores(self,*scoreslist,**kwargs):
 		delimiter = kwargs.pop('delimiter','\t')
-		assert not(kwargs), "Only one named argument, delimiter allowed"
+		weights = kwargs.pop('weights',[1.0 for i in xrange(len(scoreslist))])
+		assert not(kwargs), "Only named arguments allowed: delimiter, weights"
 		scoreVec = [0 for i in xrange((self._numNodes*(self._numNodes-1))/2)]
-		for score in scoreslist:
+		scoresInd = 0
+		for scores in scoreslist:
 			if type(scores) is str:
 				fi = open(scores,'r')
 				for line in fi:
 					w = line.rstrip().split(delimiter)
-					scoreVec[self.nPair2Ind(w[:2])] += float(w[2])
+					scoreVec[self.nPair2Ind(w[:2])] += weights[scoresInd] * float(w[2])
 			elif __iterable__(scores):
 				for w in scores:
-					scoreVec[self.nPair2Ind(w[:2])] += float(w[2])
+					scoreVec[self.nPair2Ind(w[:2])] += weights[scoresInd] * float(w[2])
 			else:
 				raise TypeError("scores need to be filename or iterable")
-			scoreVec = [scoreVec[i] for i in xrange(len(scoreVec)) if i not in self._trainedges]
-			return scoreVec
+			scoresInd += 1
+		scoreVec = [scoreVec[i] for i in xrange(len(scoreVec)) if i not in self._trainedges]
+		return scoreVec
 	
 
 	def makeScores(self,scores,delimiter='\t'):
