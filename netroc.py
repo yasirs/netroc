@@ -150,9 +150,15 @@ class NetReader(object):
 		scoreVec = [0 for i in xrange((self._numNodes*(self._numNodes-1))/2)]
 		if type(scores) is str:
 			fi = open(scores,'r')
+			seen = {}
 			for line in fi:
 				w = line.rstrip().split(delimiter)
 				scoreVec[self.nPair2Ind(w[:2])] = float(w[2])
+				ind = self.nPair2Ind(w[:2])
+				if seen.has_key(ind):
+					print "error: ", ind, "already seen as ", seen[ind]
+				else:
+					seen[ind] = w[:2]
 		elif __iterable__(scores):
 			for w in scores:
 				scoreVec[self.nPair2Ind(w[:2])] = float(w[2])
@@ -164,6 +170,7 @@ class NetReader(object):
 		return self._allLabels
 					
 	def nPair2Ind(self,x):
-		y = sorted(x,reverse=True)
+		#y = sorted(x,reverse=True)
+		y = sorted(x)
 		return ((self._node2i[y[1]]-1)*self._node2i[y[1]])/2 + self._node2i[y[0]]
 
