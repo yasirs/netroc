@@ -19,4 +19,3 @@ def plotComparison(trainfile,testfile,scorelist,labelList=None,method="roc"):
 			labels.append(scorefile)
 	pylab.legend(labels)
 
-
